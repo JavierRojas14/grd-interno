@@ -11,22 +11,39 @@ import hashlib
 import pandas as pd
 
 
-def anonimizar_ruts(columna_ruts):
+def anonimizar_ruts(columna_ruts: pd.Series) -> pd.Series:
+    """
+    Anonimiza una serie de RUTs utilizando un valor de sal almacenado en un archivo JSON. El RUT
+    debe estar sin puntos, guiones ni DV.
+
+    Parámetros:
+    columna_ruts (pd.Series): Serie de pandas que contiene los RUTs a anonimizar.
+
+    Retorna:
+    pd.Series: Serie de pandas con los RUTs anonimizados.
+    """
     try:
+        # Cargar el archivo de sales
         with open("data/external/salts.json", encoding="utf-8") as file:
             sales = json.load(file)
             sal_rut = sales["Rut Paciente"]
 
     except FileNotFoundError:
         print(
-            "Debes tener el archivo de las sales actualizado para anonimizar los RUTS. "
-            "La base de datos NO pudo ser procesada."
+            "Debes tener el archivo de las sales actualizado para anonimizar los RUTs. La base "
+            "de datos NO pudo ser procesada."
         )
         exit()
 
-    ruts_anonimizados = (
-        bytes.fromhex(sal_rut) + columna_ruts.astype(str).str.encode(encoding="utf-8")
-    ).apply(lambda x: hashlib.sha256(x).hexdigest())
+    # Convertir la sal a bytes y combinar con los RUTs
+    sal_bytes = bytes.fromhex(sal_rut)
+    ruts_bytes = columna_ruts.astype(str).str.strip().str.encode(encoding="utf-8")
+
+    # Concatena sal y rut
+    ruts_con_sal = sal_bytes + ruts_bytes
+
+    # Aplicar SHA-256 para anonimizar
+    ruts_anonimizados = ruts_con_sal.apply(lambda x: hashlib.sha256(x).hexdigest())
 
     return ruts_anonimizados
 
