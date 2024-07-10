@@ -48,6 +48,35 @@ def anonimizar_ruts(columna_ruts: pd.Series) -> pd.Series:
     return ruts_anonimizados
 
 
+def formatear_fechas_ingreso_y_egreso(df):
+    tmp = df.copy()
+
+    # Formatea las fechas de ingreso, dejando el dia primero, luego el mes y el anio
+    fecha_ingreso = (
+        tmp["DIA_ING"].astype(str)
+        + "-"
+        + tmp["MES_ING"].astype(str)
+        + "-"
+        + tmp["ANO_ING"].astype(str)
+    )
+    fecha_ingreso = pd.to_datetime(fecha_ingreso, dayfirst=True)
+
+    # Formatea las fechas de egreso, dejando el dia primero, luego el mes y el anio
+    fecha_egreso = (
+        tmp["DIA_EGR"].astype(str)
+        + "-"
+        + tmp["MES_EGR"].astype(str)
+        + "-"
+        + tmp["ANO_EGR"].astype(str)
+    )
+    fecha_egreso = pd.to_datetime(fecha_egreso, dayfirst=True)
+
+    tmp["FECHA_INGRESO"] = fecha_ingreso
+    tmp["FECHA_EGRESO"] = fecha_egreso
+
+    return tmp
+
+
 @click.command()
 @click.argument("input_filepath", type=click.Path(exists=True))
 @click.argument("output_filepath", type=click.Path())
@@ -66,6 +95,9 @@ def main(input_filepath, output_filepath):
 
     # Anonimiza los RUTS segun la sal
     df["RUT"] = anonimizar_ruts(df["RUT"])
+
+    # Formatea las fechas de ingreso y egreso
+    df = formatear_fechas_ingreso_y_egreso(df)
 
     # Exporta base de datos
     df.to_csv(f"{output_filepath}/df_procesada.csv")
