@@ -78,6 +78,7 @@ def formatear_fechas_ingreso_y_egreso(df):
 
 
 def leer_grd_sabanas(input_filepath):
+    print("> Leyendo GRD Sabanas")
     # Lee los archivos en raw y los une
     archivos_sabana = glob.glob(f"{input_filepath}/grd_sabanas/*.txt")
     df = pd.concat(
@@ -93,6 +94,18 @@ def leer_grd_sabanas(input_filepath):
     return df
 
 
+def leer_grd_interno(input_filepath):
+    print("> Leyendo GRD Interno")
+    # Lee todos los archivos Excel
+    bases_grd = glob.glob(f"{input_filepath}/grd/Egresos*.xlsx")
+
+    # Une todos los archivos Excel, y elimina fila con total de egresos
+    df = pd.concat(pd.read_excel(archivo, header=2) for archivo in bases_grd)
+    df = df[df["Hospital (Código)"] != "Suma Total"]
+
+    return df
+
+
 @click.command()
 @click.argument("input_filepath", type=click.Path(exists=True))
 @click.argument("output_filepath", type=click.Path())
@@ -104,9 +117,11 @@ def main(input_filepath, output_filepath):
     logger.info("making final data set from raw data")
 
     grd_sabanas = leer_grd_sabanas(input_filepath)
+    grd_interno = leer_grd_interno(input_filepath)
 
     # Exporta base de datos
     grd_sabanas.to_csv(f"{output_filepath}/grd_sabanas.csv")
+    grd_interno.to_csv(f"{output_filepath}/grd_interno.csv")
 
 
 if __name__ == "__main__":
