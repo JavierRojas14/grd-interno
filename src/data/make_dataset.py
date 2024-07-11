@@ -48,6 +48,26 @@ def anonimizar_ruts(columna_ruts: pd.Series) -> pd.Series:
     return ruts_anonimizados
 
 
+def unificar_formato_ruts(columna_ruts: pd.Series) -> pd.Series:
+    """
+    Funcion que consolida el formato de los RUTs de una persona. Elimina puntos, guiones y deja
+    sin digito verificador. Los RUTs entrantes DEBEN tener el digito verificador si o si.
+
+    Parámetros:
+    columna_ruts (pd.Series): Serie de pandas que contiene los RUTs a anonimizar.
+
+    Retorna:
+    pd.Series: Serie de pandas con los RUTs anonimizados.
+    """
+    # Elimina puntos, guiones y espacios
+    ruts_limpios = columna_ruts.astype(str).str.replace(r"\.|-|\s", "", regex=True).str.strip()
+
+    # Elimina el digito verificador
+    ruts_limpios = ruts_limpios.str[:-1]
+
+    return ruts_limpios
+
+
 def formatear_fechas_ingreso_y_egreso(df):
     tmp = df.copy()
 
@@ -134,7 +154,11 @@ def leer_grd_interno(input_filepath):
     df = clean_column_names(df)
 
     # Elimina fila con total de egresos
-    df = df.query("`hospital_(codigo)` != 'Suma Total'")
+    df = df.query("`hospital_(codigo)` != 'Suma Total'").copy()
+
+    # Limpia y Anonimiza RUTs
+    df["rut"] = unificar_formato_ruts(df["rut"])
+    df["rut"] = anonimizar_ruts(df["rut"])
 
     return df
 
