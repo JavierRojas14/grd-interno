@@ -129,10 +129,12 @@ def leer_grd_interno(input_filepath):
 
     # Une todos los archivos Excel, y elimina fila con total de egresos
     df = pd.concat(pd.read_excel(archivo, header=2) for archivo in bases_grd)
-    df = df[df["Hospital (Código)"] != "Suma Total"]
 
     # Limpia el nombre de las columnas
     df = clean_column_names(df)
+
+    # Elimina fila con total de egresos
+    df = df.query("`hospital_(codigo)` != 'Suma Total'")
 
     return df
 
