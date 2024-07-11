@@ -94,6 +94,34 @@ def leer_grd_sabanas(input_filepath):
     return df
 
 
+def clean_column_names(df):
+    """
+    Cleans the column names of a DataFrame by converting to lowercase and replacing spaces with
+    underscores.
+
+    :param df: The input DataFrame.
+    :type df: pandas DataFrame
+
+    :return: The DataFrame with cleaned column names.
+    :rtype: pandas DataFrame
+    """
+    tmp = df.copy()
+
+    # Clean and transform the column names using vectorization
+    cleaned_columns = (
+        df.columns.str.lower()
+        .str.normalize("NFD")
+        .str.encode("ascii", "ignore")
+        .str.decode("utf-8")
+    )
+    cleaned_columns = cleaned_columns.str.replace(" ", "_")
+
+    # Assign the cleaned column names back to the DataFrame
+    tmp.columns = cleaned_columns
+
+    return tmp
+
+
 def leer_grd_interno(input_filepath):
     print("> Leyendo GRD Interno")
     # Lee todos los archivos Excel
@@ -102,6 +130,9 @@ def leer_grd_interno(input_filepath):
     # Une todos los archivos Excel, y elimina fila con total de egresos
     df = pd.concat(pd.read_excel(archivo, header=2) for archivo in bases_grd)
     df = df[df["Hospital (Código)"] != "Suma Total"]
+
+    # Limpia el nombre de las columnas
+    df = clean_column_names(df)
 
     return df
 
