@@ -77,18 +77,9 @@ def formatear_fechas_ingreso_y_egreso(df):
     return tmp
 
 
-@click.command()
-@click.argument("input_filepath", type=click.Path(exists=True))
-@click.argument("output_filepath", type=click.Path())
-def main(input_filepath, output_filepath):
-    """Runs data processing scripts to turn raw data from (../raw) into
-    cleaned data ready to be analyzed (saved in ../processed).
-    """
-    logger = logging.getLogger(__name__)
-    logger.info("making final data set from raw data")
-
+def leer_grd_sabanas(input_filepath):
     # Lee los archivos en raw y los une
-    archivos_sabana = glob.glob(f"{input_filepath}/*.txt")
+    archivos_sabana = glob.glob(f"{input_filepath}/sabanas/*.txt")
     df = pd.concat(
         pd.read_csv(archivo, sep="\t", encoding="utf-16le") for archivo in archivos_sabana
     )
@@ -99,8 +90,23 @@ def main(input_filepath, output_filepath):
     # Formatea las fechas de ingreso y egreso
     df = formatear_fechas_ingreso_y_egreso(df)
 
+    return df
+
+
+@click.command()
+@click.argument("input_filepath", type=click.Path(exists=True))
+@click.argument("output_filepath", type=click.Path())
+def main(input_filepath, output_filepath):
+    """Runs data processing scripts to turn raw data from (../raw) into
+    cleaned data ready to be analyzed (saved in ../processed).
+    """
+    logger = logging.getLogger(__name__)
+    logger.info("making final data set from raw data")
+
+    grd_sabanas = leer_grd_sabanas(input_filepath)
+
     # Exporta base de datos
-    df.to_csv(f"{output_filepath}/df_procesada.csv")
+    grd_sabanas.to_csv(f"{output_filepath}/grd_sabanas.csv")
 
 
 if __name__ == "__main__":
