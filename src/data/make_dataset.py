@@ -79,7 +79,7 @@ def formatear_fechas_ingreso_y_egreso(df):
 
 def leer_grd_sabanas(input_filepath):
     # Lee los archivos en raw y los une
-    archivos_sabana = glob.glob(f"{input_filepath}/sabanas/*.txt")
+    archivos_sabana = glob.glob(f"{input_filepath}/grd_sabanas/*.txt")
     df = pd.concat(
         pd.read_csv(archivo, sep="\t", encoding="utf-16le") for archivo in archivos_sabana
     )
