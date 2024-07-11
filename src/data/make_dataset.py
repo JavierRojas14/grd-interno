@@ -111,6 +111,9 @@ def leer_grd_sabanas(input_filepath):
     # Formatea las fechas de ingreso y egreso
     df = formatear_fechas_ingreso_y_egreso(df)
 
+    # Ordena por la fecha de egreso
+    df = df.sort_values("FECHA_EGRESO")
+
     return df
 
 
@@ -162,6 +165,9 @@ def leer_grd_interno(input_filepath):
 
     # Agrega el anio del egreso
     df["ano_de_egreso"] = pd.to_datetime(df["fecha_de_egreso"]).dt.year
+
+    # Ordena por el anio de egreso
+    df = df.sort_values("ano_de_egreso")
 
     return df
 
