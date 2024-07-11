@@ -160,6 +160,9 @@ def leer_grd_interno(input_filepath):
     df["rut"] = unificar_formato_ruts(df["rut"])
     df["rut"] = anonimizar_ruts(df["rut"])
 
+    # Agrega el anio del egreso
+    df["ano_de_egreso"] = pd.to_datetime(df["fecha_de_egreso"]).dt.year
+
     return df
 
 
