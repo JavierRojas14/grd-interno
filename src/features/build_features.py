@@ -22,9 +22,17 @@ def limpiar_datos_operaciones_quirurgicas(df):
 
 
 # Función para fusionar datos de GRD con datos de operaciones quirúrgicas
-def fusionar_grd_con_operaciones_quirurgicas(grd_df, operaciones_df, columnas_fusion):
-    df_fusionado = grd_df.merge(operaciones_df, how="inner", left_on="RUT", right_on="ID_PACIENTE")
-    df_fusionado = df_fusionado.query("fecha >= FECHA_INGRESO and fecha <= FECHA_EGRESO")
+def fusionar_grd_con_operaciones_quirurgicas(
+    grd_df, operaciones_df, rut_grd, fecha_ingreso_grd, fecha_egreso_grd
+):
+    # Une por el RUT del paciente
+    df_fusionado = grd_df.merge(
+        operaciones_df, how="inner", left_on=rut_grd, right_on="ID_PACIENTE"
+    )
+    # Filtra las int q que esten fuera del periodo de hospitalizacion
+    df_fusionado = df_fusionado.query(
+        f"fecha >= {fecha_ingreso_grd} and fecha <= {fecha_egreso_grd}"
+    )
     return df_fusionado
 
 
