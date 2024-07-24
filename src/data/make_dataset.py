@@ -97,26 +97,6 @@ def formatear_fechas_ingreso_y_egreso(df):
     return tmp
 
 
-def leer_grd_sabanas(input_filepath):
-    print("> Leyendo GRD Sabanas")
-    # Lee los archivos en raw y los une
-    archivos_sabana = glob.glob(f"{input_filepath}/grd_sabanas/*.txt")
-    df = pd.concat(
-        pd.read_csv(archivo, sep="\t", encoding="utf-16le") for archivo in archivos_sabana
-    )
-
-    # Anonimiza los RUTS segun la sal
-    # df["RUT"] = anonimizar_ruts(df["RUT"])
-
-    # Formatea las fechas de ingreso y egreso
-    df = formatear_fechas_ingreso_y_egreso(df)
-
-    # Ordena por la fecha de egreso
-    df = df.sort_values("FECHA_EGRESO")
-
-    return df
-
-
 def clean_column_names(df):
     """
     Cleans the column names of a DataFrame by converting to lowercase and replacing spaces with
@@ -169,6 +149,26 @@ def leer_grd_interno(input_filepath):
 
     # Ordena por el anio de egreso
     df = df.sort_values("ano_de_egreso")
+
+    return df
+
+
+def leer_grd_sabanas(input_filepath):
+    print("> Leyendo GRD Sabanas")
+    # Lee los archivos en raw y los une
+    archivos_sabana = glob.glob(f"{input_filepath}/grd_sabanas/*.txt")
+    df = pd.concat(
+        pd.read_csv(archivo, sep="\t", encoding="utf-16le") for archivo in archivos_sabana
+    )
+
+    # Anonimiza los RUTS segun la sal
+    # df["RUT"] = anonimizar_ruts(df["RUT"])
+
+    # Formatea las fechas de ingreso y egreso
+    df = formatear_fechas_ingreso_y_egreso(df)
+
+    # Ordena por la fecha de egreso
+    df = df.sort_values("FECHA_EGRESO")
 
     return df
 
