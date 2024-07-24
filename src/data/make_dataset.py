@@ -143,7 +143,7 @@ def leer_grd_interno(input_filepath):
     df = df.query("hospital_codigo != 'Suma Total'").copy()
 
     # Limpia y Anonimiza RUTs
-    df["rut"] = unificar_formato_ruts(df["rut"])
+    df["RUT_LIMPIO"] = unificar_formato_ruts(df["rut"])
     # df["rut"] = anonimizar_ruts(df["rut"])
 
     # Agrega el anio del egreso
