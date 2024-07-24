@@ -136,8 +136,9 @@ def clean_column_names(df):
         .str.normalize("NFD")
         .str.encode("ascii", "ignore")
         .str.decode("utf-8")
+        .str.replace(" ", "_")
+        .str.replace(r"[()]", "", regex=True)  # Remove parentheses
     )
-    cleaned_columns = cleaned_columns.str.replace(" ", "_")
 
     # Assign the cleaned column names back to the DataFrame
     tmp.columns = cleaned_columns
@@ -157,7 +158,7 @@ def leer_grd_interno(input_filepath):
     df = clean_column_names(df)
 
     # Elimina fila con total de egresos
-    df = df.query("`hospital_(codigo)` != 'Suma Total'").copy()
+    df = df.query("hospital_codigo != 'Suma Total'").copy()
 
     # Limpia y Anonimiza RUTs
     df["rut"] = unificar_formato_ruts(df["rut"])
