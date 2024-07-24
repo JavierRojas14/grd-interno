@@ -60,7 +60,9 @@ def unificar_formato_ruts(columna_ruts: pd.Series) -> pd.Series:
     pd.Series: Serie de pandas con los RUTs anonimizados.
     """
     # Elimina puntos, guiones y espacios
-    ruts_limpios = columna_ruts.astype(str).str.replace(r"\.|-|\s", "", regex=True).str.strip()
+    ruts_limpios = (
+        columna_ruts.astype(str).str.replace(r"\.|-|\s", "", regex=True).str.strip().str.upper()
+    )
 
     # Elimina el digito verificador
     ruts_limpios = ruts_limpios.str[:-1]
