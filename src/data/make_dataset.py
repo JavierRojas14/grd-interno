@@ -106,7 +106,7 @@ def leer_grd_sabanas(input_filepath):
     )
 
     # Anonimiza los RUTS segun la sal
-    df["RUT"] = anonimizar_ruts(df["RUT"])
+    # df["RUT"] = anonimizar_ruts(df["RUT"])
 
     # Formatea las fechas de ingreso y egreso
     df = formatear_fechas_ingreso_y_egreso(df)
@@ -162,7 +162,7 @@ def leer_grd_interno(input_filepath):
 
     # Limpia y Anonimiza RUTs
     df["rut"] = unificar_formato_ruts(df["rut"])
-    df["rut"] = anonimizar_ruts(df["rut"])
+    # df["rut"] = anonimizar_ruts(df["rut"])
 
     # Agrega el anio del egreso
     df["ano_de_egreso"] = pd.to_datetime(df["fecha_de_egreso"]).dt.year
