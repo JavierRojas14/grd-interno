@@ -166,6 +166,10 @@ def leer_grd_sabanas(input_filepath):
     # Anonimiza los RUTS segun la sal
     # df["RUT"] = anonimizar_ruts(df["RUT"])
 
+    # Limpia los RUTs con la rutina usual, a pesar de que estos ya esten en formato requerido
+    ruts_con_dv = df["RUT"].astype(str) + df["DV"].astype(str)
+    df["RUT_LIMPIO"] = unificar_formato_ruts(ruts_con_dv)
+
     # Formatea las fechas de ingreso y egreso
     df = formatear_fechas_ingreso_y_egreso(df)
 
