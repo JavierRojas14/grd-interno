@@ -96,4 +96,6 @@ def iterar_en_complicaciones_a_buscar(df, dict_textos_a_buscar, tipo_complicacio
         resumen_filtrado = obtener_resumen_ocurrencia_complicacion(df, df_filtrada)
         resultados[nombre_complicacion] = resumen_filtrado
 
+        print(f"> {nombre_complicacion}: {resumen_filtrado[2]:.5%}")
+
     return resultados
