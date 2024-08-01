@@ -49,56 +49,51 @@ def guardar_en_excel(dataframes, ruta_archivo):
             df.to_excel(writer, sheet_name=nombre_hoja, index=False)
 
 
-def buscar_nombre_procedimiento_pabellon(df, operaciones):
-    df_de_operacion = df[
-        df["nombre_de_la_operacion"].fillna("").str.contains(operaciones, regex=True)
-    ]
-
-    resumen_operacion = pd.DataFrame(
+def obtener_resumen_ocurrencia_complicacion(df, df_filtrada):
+    # Obtiene el resumen de la cantidad de ocurrencias del DataFrame total y el filtrado
+    resumen = pd.DataFrame(
         {
-            "totales": df.groupby(df.fecha.dt.year).size(),
-            "operacion": df_de_operacion.groupby(df_de_operacion.fecha.dt.year).size(),
+            "totales": df.groupby("ano_de_intervencion").size(),
+            "ocurrencia_filtrado": df_filtrada.groupby("ano_de_intervencion").size(),
         }
     )
-    resumen_operacion["porcentaje"] = (
-        resumen_operacion["operacion"] / resumen_operacion["totales"]
-    ) * 100
 
-    return df_de_operacion, resumen_operacion
+    # Obtiene el resumen acumulado en el periodo
+    resumen_acumulado = resumen.sum()
+
+    # Obtiene los porcentajes de ocurrencia desglosados y acumulados
+    resumen["porcentaje"] = resumen["ocurrencia_filtrado"] / resumen["totales"]
+    porcentaje_acumulado = resumen_acumulado["ocurrencia_filtrado"] / resumen_acumulado["totales"]
+
+    return resumen, resumen_acumulado, porcentaje_acumulado
+
+
+def buscar_nombre_operacion_pabellon(df, operaciones):
+    # Filtra la base de datos segun el nombre de la operacion
+    return df[df["nombre_de_la_operacion"].fillna("").str.contains(operaciones, regex=True)]
 
 
 def buscar_nombre_diagnosticos_pabellon(df, diagnosticos):
-    df_de_diags = df[
+    # Filtra la base de datos segun el nombre del diagnostico 1 y 2
+    return df[
         (df["primer_diagnostico"].fillna("").str.contains(diagnosticos, regex=True))
         | (df["segundo_diagnostico"].fillna("").str.contains(diagnosticos, regex=True))
     ]
 
-    resumen_diags = pd.DataFrame(
-        {
-            "totales": df.groupby(df.fecha.dt.year).size(),
-            "diags": df_de_diags.groupby(df_de_diags.fecha.dt.year).size(),
-        }
-    )
-    resumen_diags["porcentaje"] = (resumen_diags["diags"] / resumen_diags["totales"]) * 100
 
-    return df_de_diags, resumen_diags
+def iterar_en_complicaciones_a_buscar(df, dict_textos_a_buscar, tipo_complicacion):
+    # Decide que parametro a buscar en la base de datos
+    busqueda_a_realizar = {
+        "intervencion_quirurgica": buscar_nombre_operacion_pabellon,
+        "diagnostico": buscar_nombre_diagnosticos_pabellon,
+    }
+    funcion_a_ocupar_para_buscar = busqueda_a_realizar[tipo_complicacion]
 
-
-def iterar_en_operaciones_a_buscar(df, dict_textos_a_buscar):
+    # Itera por el diccionario de busqueda y guarda los resultados
     resultados = {}
-    # Itera por el diccinoario de busqueda y guarda los resultados
-    for tipo_complicacion, textos_a_buscar in dict_textos_a_buscar.items():
-        busqueda = buscar_nombre_procedimiento_pabellon(df, textos_a_buscar)
-        resultados[tipo_complicacion] = busqueda
-
-    return resultados
-
-
-def iterar_en_diagnosticos_a_buscar(df, dict_diags_a_buscar):
-    resultados = {}
-    # Itera por el diccinoario de busqueda y guarda los resultados
-    for tipo_complicacion, textos_a_buscar in dict_diags_a_buscar.items():
-        busqueda = buscar_nombre_diagnosticos_pabellon(df, textos_a_buscar)
-        resultados[tipo_complicacion] = busqueda
+    for nombre_complicacion, textos_a_buscar in dict_textos_a_buscar.items():
+        df_filtrada = funcion_a_ocupar_para_buscar(df, textos_a_buscar)
+        resumen_filtrado = obtener_resumen_ocurrencia_complicacion(df, df_filtrada)
+        resultados[nombre_complicacion] = resumen_filtrado
 
     return resultados
