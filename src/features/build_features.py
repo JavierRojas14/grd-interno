@@ -76,7 +76,7 @@ def obtener_resumen_ocurrencia_complicacion(df, df_filtrada):
         / resumen_acumulado_por_especialidad["totales"]
     )
 
-    return resumen, resumen_acumulado, resumen_acumulado_por_especialidad
+    return resumen, resumen_acumulado, resumen_acumulado_por_especialidad, porcentaje_acumulado
 
 
 def buscar_nombre_operacion_pabellon(df, operaciones):
