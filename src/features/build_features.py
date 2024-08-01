@@ -47,3 +47,58 @@ def guardar_en_excel(dataframes, ruta_archivo):
     with pd.ExcelWriter(ruta_archivo) as writer:
         for nombre_hoja, df in dataframes.items():
             df.to_excel(writer, sheet_name=nombre_hoja, index=False)
+
+
+def buscar_nombre_procedimiento_pabellon(df, operaciones):
+    df_de_operacion = df[
+        df["nombre_de_la_operacion"].fillna("").str.contains(operaciones, regex=True)
+    ]
+
+    resumen_operacion = pd.DataFrame(
+        {
+            "totales": df.groupby(df.fecha.dt.year).size(),
+            "operacion": df_de_operacion.groupby(df_de_operacion.fecha.dt.year).size(),
+        }
+    )
+    resumen_operacion["porcentaje"] = (
+        resumen_operacion["operacion"] / resumen_operacion["totales"]
+    ) * 100
+
+    return df_de_operacion, resumen_operacion
+
+
+def buscar_nombre_diagnosticos_pabellon(df, diagnosticos):
+    df_de_diags = df[
+        (df["primer_diagnostico"].fillna("").str.contains(diagnosticos, regex=True))
+        | (df["segundo_diagnostico"].fillna("").str.contains(diagnosticos, regex=True))
+    ]
+
+    resumen_diags = pd.DataFrame(
+        {
+            "totales": df.groupby(df.fecha.dt.year).size(),
+            "diags": df_de_diags.groupby(df_de_diags.fecha.dt.year).size(),
+        }
+    )
+    resumen_diags["porcentaje"] = (resumen_diags["diags"] / resumen_diags["totales"]) * 100
+
+    return df_de_diags, resumen_diags
+
+
+def iterar_en_operaciones_a_buscar(df, dict_textos_a_buscar):
+    resultados = {}
+    # Itera por el diccinoario de busqueda y guarda los resultados
+    for tipo_complicacion, textos_a_buscar in dict_textos_a_buscar.items():
+        busqueda = buscar_nombre_procedimiento_pabellon(df, textos_a_buscar)
+        resultados[tipo_complicacion] = busqueda
+
+    return resultados
+
+
+def iterar_en_diagnosticos_a_buscar(df, dict_diags_a_buscar):
+    resultados = {}
+    # Itera por el diccinoario de busqueda y guarda los resultados
+    for tipo_complicacion, textos_a_buscar in dict_diags_a_buscar.items():
+        busqueda = buscar_nombre_diagnosticos_pabellon(df, textos_a_buscar)
+        resultados[tipo_complicacion] = busqueda
+
+    return resultados
