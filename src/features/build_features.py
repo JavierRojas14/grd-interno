@@ -53,8 +53,10 @@ def obtener_resumen_ocurrencia_complicacion(df, df_filtrada):
     # Obtiene el resumen de la cantidad de ocurrencias del DataFrame total y el filtrado
     resumen = pd.DataFrame(
         {
-            "totales": df.groupby("ano_de_intervencion").size(),
-            "ocurrencia_filtrado": df_filtrada.groupby("ano_de_intervencion").size(),
+            "totales": df.groupby(["ano_de_intervencion", "especialidad"]).size(),
+            "ocurrencia_filtrado": df_filtrada.groupby(
+                ["ano_de_intervencion", "especialidad"]
+            ).size(),
         }
     )
 
@@ -62,10 +64,19 @@ def obtener_resumen_ocurrencia_complicacion(df, df_filtrada):
     resumen_acumulado = resumen.sum()
 
     # Obtiene los porcentajes de ocurrencia desglosados y acumulados
-    resumen["porcentaje"] = resumen["ocurrencia_filtrado"] / resumen["totales"]
+    resumen["fraccion"] = resumen["ocurrencia_filtrado"] / resumen["totales"]
     porcentaje_acumulado = resumen_acumulado["ocurrencia_filtrado"] / resumen_acumulado["totales"]
 
-    return resumen, resumen_acumulado, porcentaje_acumulado
+    # Obtiene el resumen por especialidad acumulado
+    resumen_acumulado_por_especialidad = (
+        resumen.reset_index().groupby("especialidad")[["totales", "ocurrencia_filtrado"]].sum()
+    )
+    resumen_acumulado_por_especialidad["fraccion"] = (
+        resumen_acumulado_por_especialidad["ocurrencia_filtrado"]
+        / resumen_acumulado_por_especialidad["totales"]
+    )
+
+    return resumen, resumen_acumulado, resumen_acumulado_por_especialidad
 
 
 def buscar_nombre_operacion_pabellon(df, operaciones):
@@ -96,6 +107,6 @@ def iterar_en_complicaciones_a_buscar(df, dict_textos_a_buscar, tipo_complicacio
         resumen_filtrado = obtener_resumen_ocurrencia_complicacion(df, df_filtrada)
         resultados[nombre_complicacion] = resumen_filtrado
 
-        print(f"> {nombre_complicacion}: {resumen_filtrado[2]:.5%}")
+        print(f"> {nombre_complicacion}: {resumen_filtrado[2]}")
 
     return resultados
