@@ -113,6 +113,7 @@ def iterar_en_complicaciones_a_buscar(df, dict_textos_a_buscar, tipo_complicacio
         # Concatena resultados acumulados en el periodo por complicacion
         resultado_acumulado = resumen_filtrado[2].reset_index()
         resultado_acumulado["complicacion"] = nombre_complicacion
+        resultado_acumulado["texto_a_buscar"] = textos_a_buscar
         df_resultado = pd.concat([df_resultado, resultado_acumulado])
 
     return resultados, df_resultado
