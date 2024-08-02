@@ -102,11 +102,17 @@ def iterar_en_complicaciones_a_buscar(df, dict_textos_a_buscar, tipo_complicacio
 
     # Itera por el diccionario de busqueda y guarda los resultados
     resultados = {}
+    df_resultado = pd.DataFrame()
     for nombre_complicacion, textos_a_buscar in dict_textos_a_buscar.items():
         df_filtrada = funcion_a_ocupar_para_buscar(df, textos_a_buscar)
         resumen_filtrado = obtener_resumen_ocurrencia_complicacion(df, df_filtrada)
         resultados[nombre_complicacion] = resumen_filtrado
 
-        print(f"> {nombre_complicacion}: {resumen_filtrado[2]}")
+        # print(f"> {nombre_complicacion}: {resumen_filtrado[2]}")
 
-    return resultados
+        # Concatena resultados acumulados en el periodo por complicacion
+        resultado_acumulado = resumen_filtrado[2].reset_index()
+        resultado_acumulado["complicacion"] = nombre_complicacion
+        df_resultado = pd.concat([df_resultado, resultado_acumulado])
+
+    return resultados, df_resultado
