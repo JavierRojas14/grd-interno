@@ -192,10 +192,10 @@ def leer_grd_sabanas(input_filepath):
 
 def leer_grd_con_hmd(input_filepath):
     print(f"> Leyendo GRD con Produccion de HMD")
-    archivos_grd = glob.glob(f"{input_filepath}/grd_hmd/*.xlsx")
+    archivos_grd = glob.glob(f"{input_filepath}/grd_hmd/*.csv")
 
     # Lee los archivos en raw y los une
-    df = pd.concat(pd.read_excel(archivo) for archivo in archivos_grd)
+    df = pd.concat(pd.read_csv(archivo, sep="|") for archivo in archivos_grd)
 
     # Limpia los nombres de las columnas
     df = clean_column_names(df)
