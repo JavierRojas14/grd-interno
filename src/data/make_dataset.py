@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
-import click
+import glob
+import hashlib
+import json
 import logging
 from pathlib import Path
-from dotenv import find_dotenv, load_dotenv
 
-import glob
-import json
-import hashlib
-
+import click
 import pandas as pd
+from dotenv import find_dotenv, load_dotenv
 
 
 def anonimizar_ruts(columna_ruts: pd.Series) -> pd.Series:
@@ -48,7 +47,7 @@ def anonimizar_ruts(columna_ruts: pd.Series) -> pd.Series:
     return ruts_anonimizados
 
 
-def unificar_formato_ruts(columna_ruts: pd.Series) -> pd.Series:
+def unificar_formato_ruts(columna_ruts: pd.Series, digito_verificador=True) -> pd.Series:
     """
     Funcion que consolida el formato de los RUTs de una persona. Elimina puntos, guiones y deja
     sin digito verificador. Los RUTs entrantes DEBEN tener el digito verificador si o si.
@@ -68,8 +67,9 @@ def unificar_formato_ruts(columna_ruts: pd.Series) -> pd.Series:
         .str.lstrip("0")
     )
 
-    # Elimina el digito verificador
-    ruts_limpios = ruts_limpios.str[:-1]
+    if digito_verificador:
+        # Elimina el digito verificador si es que lo tiene
+        ruts_limpios = ruts_limpios.str[:-1]
 
     # Elimina las K que podrian haber quedado al final luego de la limpiza (por haber imputado -Kk)
     ruts_limpios = ruts_limpios.str.rstrip("K")
