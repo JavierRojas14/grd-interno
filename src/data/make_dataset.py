@@ -154,7 +154,7 @@ def leer_grd_interno(input_filepath):
     df = df.query("hospital_codigo != 'Suma Total'").copy()
 
     # Limpia y Anonimiza RUTs
-    df["RUT_LIMPIO"] = unificar_formato_ruts(df["rut"])
+    df["id_paciente"] = unificar_formato_ruts(df["rut"])
     # df["rut"] = anonimizar_ruts(df["rut"])
 
     # Agrega el anio del egreso
@@ -179,7 +179,7 @@ def leer_grd_sabanas(input_filepath):
 
     # Limpia los RUTs con la rutina usual, a pesar de que estos ya esten en formato requerido
     ruts_con_dv = df["RUT"].astype(str) + df["DV"].astype(str)
-    df["RUT_LIMPIO"] = unificar_formato_ruts(ruts_con_dv)
+    df["id_paciente"] = unificar_formato_ruts(ruts_con_dv)
 
     # Formatea las fechas de ingreso y egreso
     df = formatear_fechas_ingreso_y_egreso(df)
@@ -201,7 +201,7 @@ def leer_grd_con_hmd(input_filepath):
     df = clean_column_names(df)
 
     # Limpia los RUTs, quitando puntos, espacios, etc y el digito verificador
-    df["RUT_LIMPIO"] = unificar_formato_ruts(df["rut"])
+    df["id_paciente"] = unificar_formato_ruts(df["rut"])
 
     # Ordena la base de datos segun fecha de egreso
     df = df.sort_values("fech_alta")
